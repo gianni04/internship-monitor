@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env*
+config/telegram.json
+config/cover_letter_context.md
+config/cv.md
+config/*_known*.json
+config/quintet_state.txt
+config/telegram_offset.txt
+letters/
+logs/
