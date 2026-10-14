@@ -8,7 +8,7 @@ A small Python bot that watches the career pages of Luxembourg banks and asset m
 - An offer counts as an internship if the title contains words like "intern", "stage" or "trainee", or if the source gives a contract type of internship.
 - Seen offers are stored in `config/*_known*.json`, so each offer is sent once. The first run stores what is already online and sends nothing.
 - An offer is marked as seen only after the Telegram message goes out. If the send fails, it is retried on the next run.
-- The alert has a cover letter button. `scripts/telegram_listener.py` waits for that press, reads the job description, and calls a local LLM through the `claude` command (`claude -p`) with your profile, a reference letter and style rules. The letter comes back in the chat and is saved in `letters/`.
+- The alert has a cover letter button. `scripts/telegram_listener.py` waits for that press, reads the job description, and sends it to an LLM command-line tool (set in `scripts/cover_letter.py`) with your profile, a reference letter and style rules. The letter comes back in the chat and is saved in `letters/`.
 - I run the check every 15 minutes with Windows Task Scheduler and start the listener at logon with `scripts/start_listener.bat`.
 
 ## Run it
@@ -22,7 +22,7 @@ python scripts/check_all_offers.py     # one pass over all sources
 python scripts/telegram_listener.py    # keep running for the cover letter button
 ```
 
-Settings live in the JSON and Markdown files under `config/`, not in environment variables. Fill in `bot_token` and `chat_id` in `config/telegram.json`. The real files are git-ignored, so only the `.example` templates are in the repo. The cover letter button needs the `claude` command (a local LLM CLI) on your PATH.
+Settings live in the JSON and Markdown files under `config/`, not in environment variables. Fill in `bot_token` and `chat_id` in `config/telegram.json`. The real files are git-ignored, so only the `.example` templates are in the repo. The cover letter button needs that command-line tool on your PATH.
 
 ## Limits
 
