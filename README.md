@@ -1,40 +1,31 @@
 # internship-monitor
 
-Small Python bot I use for my internship search in Luxembourg. It checks the career sites of a few banks and asset managers, and sends new internship offers to Telegram. Each alert has a button that asks an LLM to draft a cover letter for that offer, in the style of a letter I wrote myself.
-
-## Sources
-
-| Company | How |
-|---|---|
-| Schroders | Oracle HCM REST API, requisition by ID |
-| Edmond de Rothschild | Oracle HCM REST API, job list filtered on Luxembourg |
-| BGL BNP Paribas | Career site listing (HTML) |
-| Société Générale Luxembourg | Search API used by the career site, contract type = internship |
-| Quintet Private Bank | Watches the graduates & interns page for a change |
-
-Pictet is not included: its job site disallows crawling in robots.txt.
-
-Internships are detected from the title (`intern`, `internship`, `stage`, `stagiaire`, `trainee`, `placement`, whole words only) or from the contract type when the API gives it.
+A small Python bot that watches the career pages of Luxembourg banks and asset managers for internships. New offers go to Telegram, and each alert has a button that drafts a cover letter for that offer.
 
 ## How it works
 
-- `scripts/check_all_offers.py` runs every source. Seen offer IDs are kept in `config/*_known*.json`. The first run of a source stores what is already online without sending alerts.
-- An offer is marked as seen only if the Telegram message was actually sent, so a failed send is retried on the next run.
-- `scripts/telegram_listener.py` long-polls Telegram. When the "Cover letter" button is pressed, it reads company, title and link from the alert, fetches the job description (Oracle API when possible, page text otherwise), and calls the Claude Code CLI (`claude -p`) with my profile, a reference letter and style rules from `config/cover_letter_context.md`. The letter comes back in the chat as text and as a `.md` file.
+- `scripts/check_all_offers.py` checks Schroders and Edmond de Rothschild (Oracle HCM job APIs), BGL BNP Paribas (career page), Société Générale Luxembourg (search API) and Quintet (graduate page, watched for changes). Pictet is skipped because its site disallows crawling in robots.txt.
+- An offer counts as an internship if the title contains words like "intern", "stage" or "trainee", or if the source gives a contract type of internship.
+- Seen offers are stored in `config/*_known*.json`, so each offer is sent once. The first run stores what is already online and sends nothing.
+- An offer is marked as seen only after the Telegram message goes out. If the send fails, it is retried on the next run.
+- The alert has a cover letter button. `scripts/telegram_listener.py` waits for that press, reads the job description, and calls the `claude` CLI (`claude -p`) with your profile, a reference letter and style rules. The letter comes back in the chat and is saved in `letters/`.
+- I run the check every 15 minutes with Windows Task Scheduler and start the listener at logon with `scripts/start_listener.bat`.
 
-## Setup
+## Run it
 
 ```bash
 pip install -r requirements.txt
-cp config/telegram.example.json config/telegram.json            # bot token + chat id
+cp config/telegram.example.json config/telegram.json
 cp config/cover_letter_context.example.md config/cover_letter_context.md
-python scripts/check_all_offers.py      # one pass over all sources
-python scripts/telegram_listener.py     # keep running for the cover letter button
+python scripts/notify_telegram.py      # sends a test message to your chat
+python scripts/check_all_offers.py     # one pass over all sources
+python scripts/telegram_listener.py    # keep running for the cover letter button
 ```
 
-I run `check_all_offers.py` every 15 minutes with Windows Task Scheduler and start the listener at logon. A GitHub Actions workflow is included (manual trigger only).
+Settings live in the JSON and Markdown files under `config/`, not in environment variables. Fill in `bot_token` and `chat_id` in `config/telegram.json`. The real files are git-ignored, so only the `.example` templates are in the repo. The cover letter button needs the `claude` command on your PATH.
 
 ## Limits
 
-- The sources are undocumented endpoints used by the career sites. They can change without notice.
-- Cover letters are drafts. I read and correct every one before sending.
+- The sources are the endpoints and pages the career sites use. They are not documented APIs and can change without notice.
+- The GitHub Actions workflow only runs when you start it by hand, and it needs the Telegram secrets set in the repo.
+- Cover letters are drafts. I read and correct every one before sending it.

@@ -49,4 +49,4 @@ def send_telegram_message(message: str, with_letter_button: bool = False) -> boo
         return False
 
 if __name__ == "__main__":
-    send_telegram_message("🤖 <b>Test du bot de veille stages/jobs</b>\n\nLe système de notification est opérationnel !")
+    send_telegram_message("<b>Test du bot de veille stages/jobs</b>\n\nLe système de notification est opérationnel !")

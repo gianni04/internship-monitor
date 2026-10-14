@@ -1,4 +1,4 @@
-"""Génération de lettre de motivation via la CLI Claude Code (pas de clé API)."""
+"""Génération de lettre de motivation via un CLI LLM local (pas de clé API)."""
 import html
 import os
 import re
