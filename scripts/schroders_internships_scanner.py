@@ -6,7 +6,6 @@ import time
 import requests
 from concurrent.futures import ThreadPoolExecutor
 
-# Importer notify_telegram
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from notify_telegram import send_telegram_message, esc
 
@@ -38,13 +37,13 @@ COUNTRIES = {
 INTERNSHIP_REGEX = re.compile(r'\b(intern|internship|stage|stagiaire|trainee|placement)\b', re.IGNORECASE)
 
 def is_internship(title: str) -> bool:
-    """Valide qu'un titre correspond STRICTEMENT à un stage/internship (pas d'audit interne, etc.)."""
+    """Vrai si le titre contient un mot-clé de stage."""
     if not title:
         return False
     return bool(INTERNSHIP_REGEX.search(title))
 
 def format_internship_card(job: dict) -> str:
-    """Formate une fiche d'offre conforme : Entreprise, Poste, Lieu (Pays), Lien."""
+    """Fiche Telegram (HTML) d'une offre Schroders."""
     title = job.get("Title", "Titre inconnu")
     loc = job.get("PrimaryLocation", "Lieu non précisé")
     cc = job.get("PrimaryLocationCountry", "")
@@ -58,11 +57,11 @@ def format_internship_card(job: dict) -> str:
         full_loc = loc or country_name or "Non précisé"
         
     return (
-        f"🎓 <b>NOUVELLE OFFRE DE STAGE (SCHRODERS)</b>\n\n"
-        f"🏢 <b>Entreprise :</b> Schroders\n"
-        f"💼 <b>Poste :</b> {title}\n"
-        f"📍 <b>Lieu :</b> {full_loc}\n"
-        f"🔗 <b>Lien :</b> <a href=\"{url}\">Consulter l'offre #{jid}</a>"
+        f"<b>NOUVELLE OFFRE DE STAGE (SCHRODERS)</b>\n\n"
+        f"<b>Entreprise :</b> Schroders\n"
+        f"<b>Poste :</b> {title}\n"
+        f"<b>Lieu :</b> {full_loc}\n"
+        f"<b>Lien :</b> <a href=\"{url}\">Consulter l'offre #{jid}</a>"
     )
 
 def fetch_single_id(session, jid: int):
@@ -100,7 +99,6 @@ def main():
     
     start_time = time.time()
     
-    # Charger les IDs de stages déjà connus
     known_internship_ids = set()
     if os.path.exists(KNOWN_FILE):
         try:
@@ -111,7 +109,7 @@ def main():
             
     print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Démarrage du scan Schroders (0 à 5000)...")
     
-    # En mode test, on valide le scan sur la zone active pour accélérer le gate check
+    # Mode test : petite plage autour des IDs actifs, plus rapide
     if test_run:
         scan_results = scan_range(2145, 2165, max_workers=20)
     else:
@@ -126,7 +124,7 @@ def main():
     new_internships = [j for j in scan_results if str(j["Id"]) not in known_internship_ids]
     
     if new_internships and not test_run:
-        print(f"-> {len(new_internships)} NOUVEAU(X) STAGE(S) DÉTECTÉ(S) ! Envoi des alertes...")
+        print(f"-> {len(new_internships)} nouveau(x) stage(s) détecté(s), envoi des alertes...")
         for j in new_internships:
             if send_telegram_message(format_internship_card(j), with_letter_button=True):
                 known_internship_ids.add(str(j["Id"]))  # non envoyé -> retenté au prochain passage
@@ -135,7 +133,6 @@ def main():
         with open(KNOWN_FILE, "w", encoding="utf-8") as f:
             json.dump(sorted(list(known_internship_ids)), f, indent=2)
     elif not test_run:
-        # Première initialisation
         if not os.path.exists(KNOWN_FILE):
             known_internship_ids.update([str(j["Id"]) for j in scan_results])
             with open(KNOWN_FILE, "w", encoding="utf-8") as f:

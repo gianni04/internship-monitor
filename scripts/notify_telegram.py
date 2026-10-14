@@ -5,7 +5,7 @@ import requests
 
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config", "telegram.json")
 
-LETTER_MARKUP = {"inline_keyboard": [[{"text": "✍️ Lettre de motivation", "callback_data": "letter"}]]}
+LETTER_MARKUP = {"inline_keyboard": [[{"text": "Lettre de motivation", "callback_data": "letter"}]]}
 
 def esc(s) -> str:
     """Échappe un texte pour parse_mode HTML."""
@@ -49,4 +49,4 @@ def send_telegram_message(message: str, with_letter_button: bool = False) -> boo
         return False
 
 if __name__ == "__main__":
-    send_telegram_message("<b>Test du bot de veille stages/jobs</b>\n\nLe système de notification est opérationnel !")
+    send_telegram_message("<b>Test du bot de veille stages/jobs</b>\n\nLa notification fonctionne.")

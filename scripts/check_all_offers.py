@@ -38,17 +38,17 @@ def check_quintet():
                 
         if prev_state and prev_state != current_state:
             msg = (
-                "🎓 <b>NOUVELLE OFFRE DE STAGE (QUINTET)</b>\n\n"
-                "🏢 <b>Entreprise :</b> Quintet Private Bank\n"
-                "💼 <b>Poste :</b> Graduate & Interns Programme\n"
-                "📍 <b>Lieu :</b> Luxembourg (Luxembourg)\n"
-                f"🔗 <b>Lien :</b> <a href=\"{url}\">Consulter l'offre</a>"
+                "<b>NOUVELLE OFFRE DE STAGE (QUINTET)</b>\n\n"
+                "<b>Entreprise :</b> Quintet Private Bank\n"
+                "<b>Poste :</b> Graduate & Interns Programme\n"
+                "<b>Lieu :</b> Luxembourg (Luxembourg)\n"
+                f"<b>Lien :</b> <a href=\"{url}\">Consulter l'offre</a>"
             )
             if not send_telegram_message(msg, with_letter_button=True):
                 return "Quintet : changement détecté mais envoi Telegram échoué (retenté au prochain passage)."
             with open(cache_file, "w", encoding="utf-8") as f:
                 f.write(current_state)
-            return "Quintet : Changement détecté et notifié sur Telegram !"
+            return "Quintet : changement détecté et notifié sur Telegram."
         elif not prev_state:
             with open(cache_file, "w", encoding="utf-8") as f:
                 f.write(current_state)

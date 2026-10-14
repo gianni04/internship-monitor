@@ -27,7 +27,7 @@ def is_internship(title: str) -> bool:
     return bool(title and INTERNSHIP_REGEX.search(title))
 
 
-# --- Sources (remplies après identification des endpoints) -------------------
+# Sources
 
 def fetch_oracle_ce(host: str, site: str, location_facet: str) -> list:
     """Oracle HCM Candidate Experience (liste publique, filtrée par lieu côté serveur)."""
@@ -84,7 +84,7 @@ def fetch_bgl():
             oid = re.sub(r"-\d+$", "", slug)  # même offre listée 2x avec suffixe "-1"
             if oid not in jobs:
                 new += 1
-                clean = lambda x: html.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", x))).replace("​", "").strip()
+                clean = lambda x: html.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", x))).replace("\u200b", "").strip()
                 jobs[oid] = {"id": oid, "title": clean(title), "location": clean(loc) or "Luxembourg", "url": base + href}
         if not new:
             break
@@ -128,15 +128,15 @@ SOURCES = {
 }
 
 
-# --- Coeur -------------------------------------------------------------------
+# Logique principale
 
 def format_card(bank: str, job: dict) -> str:
     return (
-        f"🎓 <b>NOUVELLE OFFRE DE STAGE ({esc(bank.upper())})</b>\n\n"
-        f"🏢 <b>Entreprise :</b> {esc(bank)}\n"
-        f"💼 <b>Poste :</b> {esc(job['title'])}\n"
-        f"📍 <b>Lieu :</b> {esc(job.get('location') or 'Luxembourg')}\n"
-        f"🔗 <b>Lien :</b> <a href=\"{esc(job['url'])}\">Consulter l'offre</a>"
+        f"<b>NOUVELLE OFFRE DE STAGE ({esc(bank.upper())})</b>\n\n"
+        f"<b>Entreprise :</b> {esc(bank)}\n"
+        f"<b>Poste :</b> {esc(job['title'])}\n"
+        f"<b>Lieu :</b> {esc(job.get('location') or 'Luxembourg')}\n"
+        f"<b>Lien :</b> <a href=\"{esc(job['url'])}\">Consulter l'offre</a>"
     )
 
 
