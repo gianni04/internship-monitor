@@ -1,4 +1,4 @@
-"""Veille stages Luxembourg : BGL BNP Paribas, Société Générale Luxembourg, Pictet, Edmond de Rothschild.
+"""Veille stages Luxembourg : BGL BNP Paribas, Société Générale Luxembourg, Edmond de Rothschild.
 
 Chaque source = une fonction fetch_<banque>() -> list[dict(id, title, location, url)].
 Etat : config/banks_known.json  {"<banque>": ["id", ...]}
@@ -124,7 +124,7 @@ SOURCES = {
     "BGL BNP Paribas": fetch_bgl,
     "Société Générale Luxembourg": fetch_sg,
     "Edmond de Rothschild": fetch_edr,
-    # Pictet : site SuccessFactors avec robots.txt "Disallow: /" -> non scrapé volontairement.
+    # Pictet : pas de source implémentée (aucun scraper n'a été écrit pour son site carrières).
 }
 
 

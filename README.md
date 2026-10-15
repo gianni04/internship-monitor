@@ -4,7 +4,7 @@ A small Python bot that watches the career pages of Luxembourg banks and asset m
 
 ## How it works
 
-- `scripts/check_all_offers.py` checks Schroders and Edmond de Rothschild (Oracle HCM job APIs), BGL BNP Paribas (career page), Société Générale Luxembourg (search API) and Quintet (graduate page, watched for changes). Pictet is skipped because its site disallows crawling in robots.txt.
+- `scripts/check_all_offers.py` checks Schroders and Edmond de Rothschild (Oracle HCM job APIs), BGL BNP Paribas (career page), Société Générale Luxembourg (search API) and Quintet (graduate page, watched for changes). Pictet is not covered: no scraper is written for its careers site.
 - An offer counts as an internship if the title contains words like "intern", "stage" or "trainee", or if the source gives a contract type of internship.
 - Seen offers are stored in `config/*_known*.json`, so each offer is sent once. The first run stores what is already online and sends nothing.
 - An offer is marked as seen only after the Telegram message goes out. If the send fails, it is retried on the next run.
